@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-4">
+    <h2 class="mb-4">Add Student</h2>
+    <form method="POST" action="{{ url_for('add_student') }}">
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name" name="name" required value="{{ form_data.name if form_data else '' }}">
+        </div>
+        <div class="mb-3">
+            <label for="weekend_exam" class="form-label">Weekend Exam</label>
+            <input type="number" class="form-control" id="weekend_exam" name="weekend_exam" min="0" max="100" value="{{ form_data.weekend_exam if form_data else '' }}">
+        </div>
+        <div class="mb-3">
+            <label for="mid_marks" class="form-label">Mid Marks</label>
+            <input type="number" class="form-control" id="mid_marks" name="mid_marks" min="0" max="100" value="{{ form_data.mid_marks if form_data else '' }}">
+        </div>
+        <div class="mb-3">
+            <label for="crt_score" class="form-label">CRT Score</label>
+            <input type="number" class="form-control" id="crt_score" name="crt_score" min="0" max="100" value="{{ form_data.crt_score if form_data else '' }}">
+        </div>
+        <div class="mb-3">
+            <label for="attendance_percent" class="form-label">Attendance Percent</label>
+            <input type="number" class="form-control" id="attendance_percent" name="attendance_percent" min="0" max="100" value="{{ form_data.attendance_percent if form_data else '' }}">
+        </div>
+        <div class="mb-3">
+            <label for="gd_attendance" class="form-label">GD Attendance</label>
+            <input type="number" class="form-control" id="gd_attendance" name="gd_attendance" min="0" max="100" value="{{ form_data.gd_attendance if form_data else '' }}">
+        </div>
+        <div class="mb-3">
+            <label for="previous_sem_percent" class="form-label">Previous Sem GPA</label>
+            <input type="number" class="form-control {{ 'is-invalid' if errors and 'previous_sem_percent' in errors else '' }}" id="previous_sem_percent" name="previous_sem_percent" min="0" max="10" value="{{ form_data.previous_sem_percent if form_data else '' }}">
+            {% if errors and 'previous_sem_percent' in errors %}
+                <div class="text-danger mt-1">{{ errors.previous_sem_percent }}</div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            <label for="extra_activities_score" class="form-label">Extra Activities Score</label>
+            <input type="number" class="form-control {{ 'is-invalid' if errors and 'extra_activities_score' in errors else '' }}" id="extra_activities_score" name="extra_activities_score" min="0" max="10" value="{{ form_data.extra_activities_score if form_data else '' }}">
+            {% if errors and 'extra_activities_score' in errors %}
+                <div class="text-danger mt-1">{{ errors.extra_activities_score }}</div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            <label for="project_count" class="form-label">Project Count</label>
+            <input type="number" class="form-control {{ 'is-invalid' if errors and 'project_count' in errors else '' }}" id="project_count" name="project_count" min="0" max="10" value="{{ form_data.project_count if form_data else '' }}">
+            {% if errors and 'project_count' in errors %}
+                <div class="text-danger mt-1">{{ errors.project_count }}</div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            <label for="backlogs" class="form-label">Backlogs</label>
+            <input type="number" class="form-control {{ 'is-invalid' if errors and 'backlogs' in errors else '' }}" id="backlogs" name="backlogs" min="0" max="15" value="{{ form_data.backlogs if form_data else '' }}">
+            {% if errors and 'backlogs' in errors %}
+                <div class="text-danger mt-1">{{ errors.backlogs }}</div>
+            {% endif %}
+        </div>
+        <button type="submit" class="btn btn-primary">Add</button>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary ms-2">Cancel</a>
+    </form>
+</div>
+{% endblock %}

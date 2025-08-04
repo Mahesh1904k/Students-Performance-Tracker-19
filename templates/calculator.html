@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-4">
+    <h2 class="mb-4 text-center">Student Performance Calculator</h2>
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    <form method="POST" id="calculatorForm">
+        <div class="mb-3">
+            <label for="num_subjects" class="form-label">Number of Subjects</label>
+            <input type="number" class="form-control" id="num_subjects" name="num_subjects" min="1" value="{{ num_subjects or '' }}" required>
+        </div>
+        <div id="subjectsContainer">
+            {% if num_subjects %}
+            {% for i in range(num_subjects) %}
+                <div class="mb-3 row">
+                    <div class="col-md-4">
+                        <label class="form-label">Subject {{ i + 1 }} Name</label>
+                        <input type="text" class="form-control" name="subject_name_{{ i }}" value="{{ subject_names[i] if subject_names else '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Marks Obtained</label>
+                        <input type="number" class="form-control" name="mark_{{ i }}" min="0" value="{{ marks_obtained[i] if marks_obtained else '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Max Marks</label>
+                        <input type="number" class="form-control" name="max_mark_{{ i }}" min="0" value="{{ max_marks_list[i] if max_marks_list else '' }}">
+                    </div>
+                </div>
+            {% endfor %}
+            {% endif %}
+        </div>
+        <button type="submit" class="btn btn-primary btn-gradient">Calculate Percentage</button>
+    </form>
+    {% if percentage is not none %}
+        <div class="mt-4 alert alert-info">
+            <h4>Overall Percentage: {{ "%.2f"|format(percentage) }}%</h4>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const numSubjectsInput = document.getElementById('num_subjects');
+    const subjectsContainer = document.getElementById('subjectsContainer');
+
+    function renderSubjectInputs() {
+        const numSubjects = parseInt(numSubjectsInput.value);
+        subjectsContainer.innerHTML = '';
+        if (isNaN(numSubjects) || numSubjects <= 0) return;
+        for (let i = 0; i < numSubjects; i++) {
+            const div = document.createElement('div');
+            div.className = 'mb-3 row';
+
+            const col1 = document.createElement('div');
+            col1.className = 'col-md-4';
+            const label1 = document.createElement('label');
+            label1.className = 'form-label';
+            label1.textContent = `Subject ${i + 1} Name`;
+            const input1 = document.createElement('input');
+            input1.type = 'text';
+            input1.name = `subject_name_${i}`;
+            input1.className = 'form-control';
+            col1.appendChild(label1);
+            col1.appendChild(input1);
+
+            const col2 = document.createElement('div');
+            col2.className = 'col-md-4';
+            const label2 = document.createElement('label');
+            label2.className = 'form-label';
+            label2.textContent = 'Marks Obtained';
+            const input2 = document.createElement('input');
+            input2.type = 'number';
+            input2.name = `mark_${i}`;
+            input2.min = 0;
+            input2.className = 'form-control';
+            col2.appendChild(label2);
+            col2.appendChild(input2);
+
+            const col3 = document.createElement('div');
+            col3.className = 'col-md-4';
+            const label3 = document.createElement('label');
+            label3.className = 'form-label';
+            label3.textContent = 'Max Marks';
+            const input3 = document.createElement('input');
+            input3.type = 'number';
+            input3.name = `max_mark_${i}`;
+            input3.min = 0;
+            input3.className = 'form-control';
+            col3.appendChild(label3);
+            col3.appendChild(input3);
+
+            div.appendChild(col1);
+            div.appendChild(col2);
+            div.appendChild(col3);
+
+            subjectsContainer.appendChild(div);
+        }
+    }
+
+    numSubjectsInput.addEventListener('input', renderSubjectInputs);
+
+    // Initial render if value exists
+    if (numSubjectsInput.value) {
+        renderSubjectInputs();
+    }
+});
+</script>
+{% endblock %}
