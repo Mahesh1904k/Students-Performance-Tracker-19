@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: Students-Performance-Tracker-19
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app:app"
+    region: singapore
+    plan: free
+    branch: master
+    autoDeploy: true
+    envVars:
+      - key: FLASK_ENV
+        value: production
