@@ -3,5 +3,5 @@ services:
     name: Students-Performance-Tracker-19
     env: python
     pythonVersion: 3.12.1
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
     startCommand: gunicorn app:app
