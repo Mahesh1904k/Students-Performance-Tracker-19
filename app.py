@@ -3,7 +3,6 @@ import csv
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, make_response
 from functools import wraps
-import pymongo
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from dotenv import load_dotenv
@@ -14,6 +13,7 @@ app = Flask(__name__)
 
 app.secret_key = 'supersecretkey'  # Change this in production
 
+# Use only the Atlas MongoDB URI from environment variable
 app.config['MONGO_URI'] = os.getenv('MONGO_URI', 'mongodb+srv://Mahesh_user2:Mahesh-2004@studentscategorizer.xtci9mi.mongodb.net/studentdb')
 
 mongo = PyMongo(app)
@@ -21,9 +21,9 @@ mongo = PyMongo(app)
 # User management collection
 users_collection = mongo.db.users
 
-# MongoDB setup for Atlas
-client = pymongo.MongoClient("mongodb+srv://Mahesh_user2:Mahesh-2004@studentscategorizer.xtci9mi.mongodb.net/")
-db = client["student_tracker"]
+# Use the same connection for all database operations
+client = mongo.cx  # Get the underlying PyMongo client
+db = mongo.db  # Use the database from PyMongo
 
 def login_required(f):
     @wraps(f)
@@ -657,4 +657,4 @@ if __name__ == '__main__':
 
 
 
-        
+print(mongo.db)  # Should not be None
