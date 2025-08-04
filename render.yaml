@@ -1,8 +1,0 @@
-services:
-  - type: web
-    name: Students-Performance-Tracker-19
-    env: docker
-    region: singapore
-    plan: free
-    dockerfilePath: ./Dockerfile
-    autoDeploy: true
