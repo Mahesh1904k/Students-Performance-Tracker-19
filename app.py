@@ -1,23 +1,12 @@
 import os
+import csv
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, make_response
 from functools import wraps
 import pymongo
-import os
-
 from flask_pymongo import PyMongo
-
 from bson.objectid import ObjectId
-
 from dotenv import load_dotenv
-
-import pytesseract
-
-from PIL import Image
-
-from pdf2image import convert_from_path
-
-import csv
 
 load_dotenv()
 
