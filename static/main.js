@@ -108,13 +108,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.getElementById('searchInput').addEventListener('input', filterTable);
-    document.getElementById('zoneFilter').addEventListener('change', filterTable);
-    document.querySelectorAll('.zone-filter').forEach(el => {
-        el.addEventListener('click', function() {
-            document.getElementById('zoneFilter').value = this.dataset.zone;
-            filterTable();
-            // animateZoneButton(this); // This function doesn't exist, so commenting out
-        });
+    document.getElementById('zoneFilter').addEventListener('click', function() {
+        // Since this is the "All Zones" button, clear any zone filter and refresh table
+        filterTable();
     });
 
     document.getElementById('createGroupBtn').addEventListener('click', function(e) {
@@ -475,11 +471,11 @@ function filterTable() {
 }
 
 function updateZoneCounts() {
-    let good = studentsData.filter(s => s.zone === 'Good').length;
-    let avg = studentsData.filter(s => s.zone === 'Average').length;
+    let excellent = studentsData.filter(s => s.zone === 'Good').length;
+    let goodAverage = studentsData.filter(s => s.zone === 'Average').length;
     let red = studentsData.filter(s => s.zone === 'Red Zone').length;
-    document.getElementById('safeCount').textContent = good;
-    document.getElementById('avgCount').textContent = avg;
+    document.getElementById('safeCount').textContent = excellent;
+    document.getElementById('avgCount').textContent = goodAverage;
     document.getElementById('redCount').textContent = red;
 }
 
