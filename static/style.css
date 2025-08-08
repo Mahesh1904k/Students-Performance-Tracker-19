@@ -10,7 +10,7 @@
     --redzone-gradient-start: #ff416c;
     --redzone-gradient-end: #ff4b2b;
 
-    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
     --shadow-light: rgba(0, 0, 0, 0.1);
     --shadow-medium: rgba(0, 0, 0, 0.2);
@@ -547,10 +547,11 @@ body {
     left: 100%;
 }
 
-/* Change font for Student Performance Tracker & Risk Categorizer */
+/* Heading font for main page title */
 h2.mb-4.text-center {
-    font-family: 'Times New Roman', Times, serif;
-    font-style: italic;
+    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.5px;
 }
 
 /* Fix for modal backdrop blocking entire screen */

@@ -20,11 +20,11 @@
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Marks Obtained</label>
-                        <input type="number" class="form-control" name="mark_{{ i }}" min="0" value="{{ marks_obtained[i] if marks_obtained else '' }}">
+                        <input type="number" class="form-control" name="mark_{{ i }}" min="0" step="any" value="{{ marks_obtained[i] if marks_obtained else '' }}">
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Max Marks</label>
-                        <input type="number" class="form-control" name="max_mark_{{ i }}" min="0" value="{{ max_marks_list[i] if max_marks_list else '' }}">
+                        <input type="number" class="form-control" name="max_mark_{{ i }}" min="0" step="any" value="{{ max_marks_list[i] if max_marks_list else '' }}">
                     </div>
                 </div>
             {% endfor %}
@@ -71,6 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
             label2.textContent = 'Marks Obtained';
             const input2 = document.createElement('input');
             input2.type = 'number';
+            input2.step = 'any';
             input2.name = `mark_${i}`;
             input2.min = 0;
             input2.className = 'form-control';
@@ -84,6 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
             label3.textContent = 'Max Marks';
             const input3 = document.createElement('input');
             input3.type = 'number';
+            input3.step = 'any';
             input3.name = `max_mark_${i}`;
             input3.min = 0;
             input3.className = 'form-control';

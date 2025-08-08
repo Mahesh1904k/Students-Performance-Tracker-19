@@ -139,6 +139,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }).catch(err => alert('Error creating group: ' + err.message));
     });
 
+    // Create group on Enter key inside the New Group Name input
+    const newGroupInput = document.getElementById('newGroupName');
+    newGroupInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('createGroupBtn').click();
+        }
+    });
+
     // Handle group selection from dropdown
     groupOptions.addEventListener('click', function(e) {
         if (e.target.classList.contains('dropdown-option')) {

@@ -75,34 +75,34 @@ def get_collection(group_name=None):
 def categorize_student(student):
     red_zone_fields = []
     average_fields = []
-    # Weekend Exam (avg)
+    # Weekend Exam (avg) — Good ≥ 80, Average 60–79, Red < 60
     try:
         weekend_avg = float(student.get('weekend_exam', 0))
     except:
         weekend_avg = 0
-    if weekend_avg < 50:
+    if weekend_avg < 60:
         red_zone_fields.append('weekend_exam')
-    elif weekend_avg < 75:
+    elif weekend_avg < 80:
         average_fields.append('weekend_exam')
-    # Mid Marks (avg)
+    # Mid Marks (avg) — Good ≥ 80, Average 60–79, Red < 60
     try:
         mid_avg = float(student.get('mid_marks', 0))
     except:
         mid_avg = 0
-    if mid_avg < 50:
+    if mid_avg < 60:
         red_zone_fields.append('mid_marks')
-    elif mid_avg < 75:
+    elif mid_avg < 80:
         average_fields.append('mid_marks')
-    # CRT Score (%)
+    # CRT Score (%) — Good ≥ 80, Average 60–79, Red < 60
     try:
         crt = float(student.get('crt_score', 0))
     except:
         crt = 0
-    if crt < 50:
+    if crt < 60:
         red_zone_fields.append('crt_score')
-    elif crt < 70:
+    elif crt < 80:
         average_fields.append('crt_score')
-    # Attendance (%)
+    # Attendance (%) — Good ≥ 80, Average 70–79, Red < 70
     try:
         att = float(student.get('attendance_percent', 0))
     except:
@@ -111,14 +111,14 @@ def categorize_student(student):
         red_zone_fields.append('attendance_percent')
     elif att < 80:
         average_fields.append('attendance_percent')
-    # GD Attendance (%)
+    # GD Attendance (%) — Good ≥ 80, Average 70–79, Red < 70
     try:
         gd = float(student.get('gd_attendance', 0))
     except:
         gd = 0
-    if gd < 40:
+    if gd < 70:
         red_zone_fields.append('gd_attendance')
-    elif gd < 70:
+    elif gd < 80:
         average_fields.append('gd_attendance')
     # Previous Sem GPA
     try:
@@ -129,27 +129,25 @@ def categorize_student(student):
         red_zone_fields.append('previous_sem_percent')
     elif prev_gpa < 8.0:
         average_fields.append('previous_sem_percent')
-    # Backlogs
+    # Backlogs — does not affect zone per final summary
     try:
-        backlogs = int(student.get('backlogs', 0))
+        backlogs = float(student.get('backlogs', 0))
     except:
         backlogs = 0
-    if backlogs > 0:
-        red_zone_fields.append('backlogs')
-    # Extra Activities
+    # Extra Activities — Average if none, Good otherwise
     try:
-        extra = int(student.get('extra_activities_score', 0))
+        extra = float(student.get('extra_activities_score', 0))
     except:
         extra = 0
     if extra == 0:
-        red_zone_fields.append('extra_activities_score')
-    # Projects Completed
+        average_fields.append('extra_activities_score')
+    # Projects Completed — Average if none, Good otherwise
     try:
-        projects = int(student.get('project_count', 0))
+        projects = float(student.get('project_count', 0))
     except:
         projects = 0
     if projects == 0:
-        red_zone_fields.append('project_count')
+        average_fields.append('project_count')
     # Final Zone
     if red_zone_fields:
         return 'Red Zone', red_zone_fields, average_fields
