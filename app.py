@@ -19,6 +19,20 @@ app.config['MONGO_URI'] = os.getenv('MONGO_URI', 'mongodb+srv://Mahesh_user2:Mah
 
 mongo = PyMongo(app)
 
+from werkzeug.security import generate_password_hash
+
+# Automatically create a default admin account if no users exist
+with app.app_context():
+    if mongo.db.users.count_documents({}) == 0:
+        mongo.db.users.insert_one({
+            "username": "admin",
+            "password_hash": generate_password_hash("admin123")
+        })
+        print("\n✅ Default admin created:")
+        print("   Username: admin")
+        print("   Password: admin123\n")
+
+
 # User management collection
 users_collection = mongo.db.users
 
