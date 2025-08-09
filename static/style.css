@@ -360,8 +360,10 @@ body::before {
 .login-image-col {
     background: linear-gradient(rgba(106, 17, 203, 0.8), rgba(37, 117, 252, 0.8)), url('dashboard-7559210_1280.png');
     background-size: cover;
-    background-position: center;
+    background-position: top center; /* ensure it hugs the top edge */
     background-repeat: no-repeat;
+    height: 100%;
+    min-height: 100vh; /* guarantee full viewport height */
 }
 
 .login-form-card {
