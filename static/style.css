@@ -134,6 +134,28 @@ body {
     vertical-align: middle;
 }
 
+/* Indicator for Average zone contributing fields */
+.avg-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #ffc107; /* Bootstrap warning color */
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
+/* Indicator for Good (green) zone contributing fields */
+.good-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #28a745; /* Bootstrap success color */
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
 .form-control {
     border-radius: 0.5rem;
     border: 1px solid #ccc;
@@ -641,4 +663,47 @@ h2.mb-4.text-center {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
+}
+
+
+
+/* Dedicated gradient buttons */
+.btn-blue-gradient {
+  background: linear-gradient(45deg, #36d1dc, #5b86e5);
+  color: #fff;
+  border: none;
+  transition: background-position 0.5s ease, transform 0.3s ease;
+  background-size: 200% 200%;
+  background-position: left;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+}
+.btn-blue-gradient:hover {
+  background-position: right;
+  transform: scale(1.05);
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+.btn-purple-gradient {
+  background: linear-gradient(45deg, #7b2ff7, #4c00ff);
+  color: #fff;
+  border: none;
+  transition: background-position 0.5s ease, transform 0.3s ease;
+  background-size: 200% 200%;
+  background-position: left;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+}
+.btn-purple-gradient:hover {
+  background-position: right;
+  transform: scale(1.05);
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
 }

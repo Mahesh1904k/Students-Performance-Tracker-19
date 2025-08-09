@@ -6,6 +6,7 @@ from functools import wraps
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from dotenv import load_dotenv
+from werkzeug.security import generate_password_hash, check_password_hash
 
 load_dotenv()
 
@@ -28,35 +29,15 @@ db = mongo.db  # Use the database from PyMongo
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        # First check if user is logged in via session
+        # Only allow access if logged in via this session
         if 'logged_in' in session:
-            # Add cache control headers to prevent caching of protected pages
             response = make_response(f(*args, **kwargs))
             response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, private, max-age=0'
             response.headers['Pragma'] = 'no-cache'
             response.headers['Expires'] = '0'
-            response.headers['X-Frame-Options'] = 'DENY'  # Prevent clickjacking
+            response.headers['X-Frame-Options'] = 'DENY'
             return response
-        
-        # If not logged in via session, check for remember me cookie
-        remember_token = request.cookies.get('remember_token')
-        if remember_token:
-            # Verify the token (in this case, it's just the username)
-            user = users_collection.find_one({'username': remember_token})
-            if user:
-                # Log the user in by setting session variables
-                session['logged_in'] = True
-                session['username'] = remember_token
-                session['current_group'] = session.get('current_group', None)
-                # Add cache control headers to prevent caching of protected pages
-                response = make_response(f(*args, **kwargs))
-                response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, private, max-age=0'
-                response.headers['Pragma'] = 'no-cache'
-                response.headers['Expires'] = '0'
-                response.headers['X-Frame-Options'] = 'DENY'  # Prevent clickjacking
-                return response
-        
-        # If neither session nor cookie is valid, redirect to login
+        # Redirect to login if not authenticated
         return redirect(url_for('login'))
     return decorated_function
 
@@ -129,11 +110,13 @@ def categorize_student(student):
         red_zone_fields.append('previous_sem_percent')
     elif prev_gpa < 8.0:
         average_fields.append('previous_sem_percent')
-    # Backlogs — does not affect zone per final summary
+    # Backlogs — if any (> 0), student is in Red Zone
     try:
         backlogs = float(student.get('backlogs', 0))
     except:
         backlogs = 0
+    if backlogs > 0:
+        red_zone_fields.append('backlogs')
     # Extra Activities — Average if none, Good otherwise
     try:
         extra = float(student.get('extra_activities_score', 0))
@@ -435,87 +418,58 @@ def zone_students(zone):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        remember = request.form.get('remember')  # Get the remember me checkbox value
-        
-        # Check if user exists in database
-        user = users_collection.find_one({'username': username, 'password': password})
-        
-        if user:
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '')
+
+        # 1) Look up user in users collection
+        user = users_collection.find_one({'username': username})
+
+        # Back-compat: migrate plain password -> password_hash if found
+        if user and 'password' in user and 'password_hash' not in user:
+            if user['password'] == password:
+                users_collection.update_one({'_id': user['_id']}, {'$set': {'password_hash': generate_password_hash(password)}, '$unset': {'password': ''}})
+                user = users_collection.find_one({'_id': user['_id']})
+
+        if user and 'password_hash' in user and check_password_hash(user['password_hash'], password):
+            session.clear()
             session['logged_in'] = True
             session['username'] = username
-            # Load last selected group from session or default to None
             session['current_group'] = session.get('current_group', None)
-            
-            # Handle "Remember Me" functionality
-            if remember:
-                # Set a cookie that expires in 30 days
-                response = make_response(redirect(url_for('index')))
-                response.set_cookie('remember_token', username, max_age=30*24*60*60)
-                # Add security headers
-                response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, private, max-age=0'
-                response.headers['Pragma'] = 'no-cache'
-                response.headers['Expires'] = '0'
-                response.headers['X-Frame-Options'] = 'DENY'
-                return response
-            else:
-                # Clear the remember token cookie if it exists
-                response = make_response(redirect(url_for('index')))
-                response.set_cookie('remember_token', '', expires=0)
-                # Add security headers
-                response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, private, max-age=0'
-                response.headers['Pragma'] = 'no-cache'
-                response.headers['Expires'] = '0'
-                response.headers['X-Frame-Options'] = 'DENY'
-                return response
-        else:
-            # Check hardcoded credentials for backward compatibility
-            # Only allow this if there's no user with username 'Mahesh' in the database
-            if username == 'Mahesh' and password == 'Mahesh123':
-                # Create user in database if not exists
-                if not users_collection.find_one({'username': 'Mahesh'}):
-                    users_collection.insert_one({
-                        'username': 'Mahesh',
-                        'password': 'Mahesh123'
-                    })
-                
-                session['logged_in'] = True
-                session['username'] = username
-                # Load last selected group from session or default to None
-                session['current_group'] = session.get('current_group', None)
-                
-                # Handle "Remember Me" functionality
-                if remember:
-                    # Set a cookie that expires in 30 days
-                    response = make_response(redirect(url_for('index')))
-                    response.set_cookie('remember_token', username, max_age=30*24*60*60)
-                    # Add security headers
-                    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, private, max-age=0'
-                    response.headers['Pragma'] = 'no-cache'
-                    response.headers['Expires'] = '0'
-                    response.headers['X-Frame-Options'] = 'DENY'
-                    return response
-                else:
-                    # Clear the remember token cookie if it exists
-                    response = make_response(redirect(url_for('index')))
-                    response.set_cookie('remember_token', '', expires=0)
-                    # Add security headers
-                    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, private, max-age=0'
-                    response.headers['Pragma'] = 'no-cache'
-                    response.headers['Expires'] = '0'
-                    response.headers['X-Frame-Options'] = 'DENY'
-                    return response
-            else:
-                error = 'Invalid username or password'
-                # Add cache control headers to prevent caching of login page with error
-                response = make_response(render_template('login.html', error=error))
-                response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, private, max-age=0'
-                response.headers['Pragma'] = 'no-cache'
-                response.headers['Expires'] = '0'
-                response.headers['X-Frame-Options'] = 'DENY'
-                return response
-    # Add cache control headers to prevent caching of login page
+            response = make_response(redirect(url_for('index')))
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, private, max-age=0'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            response.headers['X-Frame-Options'] = 'DENY'
+            return response
+
+        # 2) Default: allow login using a student name (username == student.name and password == same name)
+        student = mongo.db.students.find_one({'name': username})
+        if student and password == username:
+            # Create a corresponding user with hashed default password = student's name
+            users_collection.insert_one({
+                'username': username,
+                'password_hash': generate_password_hash(password)
+            })
+            session.clear()
+            session['logged_in'] = True
+            session['username'] = username
+            session['current_group'] = session.get('current_group', None)
+            response = make_response(redirect(url_for('index')))
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, private, max-age=0'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            response.headers['X-Frame-Options'] = 'DENY'
+            return response
+
+        # Invalid
+        error = 'Invalid username or password'
+        response = make_response(render_template('login.html', error=error))
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, private, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        response.headers['X-Frame-Options'] = 'DENY'
+        return response
+
     response = make_response(render_template('login.html'))
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, private, max-age=0'
     response.headers['Pragma'] = 'no-cache'
@@ -526,12 +480,10 @@ def login():
 @app.route('/logout')
 @login_required
 def logout():
-    # Clear only logged_in to keep current_group in session
-    session.pop('logged_in', None)
-    # Create response to clear the remember me cookie
+    # Fully clear the session and any auth cookies to force revalidation next login
+    session.clear()
     response = make_response(redirect(url_for('login')))
     response.set_cookie('remember_token', '', expires=0)
-    # Add security headers to prevent caching
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, private, max-age=0'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'
@@ -541,56 +493,58 @@ def logout():
 @app.route('/change_credentials', methods=['GET', 'POST'])
 @login_required
 def change_credentials():
-    # Ensure username is in session
-    if 'username' not in session:
-        # If not, try to get it from the users collection using the default username
-        user = users_collection.find_one({'username': 'Mahesh'})
-        if user:
-            session['username'] = user['username']
-        else:
-            # Fallback to default username
-            session['username'] = 'Mahesh'
-    
     if request.method == 'POST':
-        current_password = request.form.get('current_password')
-        new_username = request.form.get('new_username')
+        current_password = request.form.get('current_password', '')
+        new_username = (request.form.get('new_username') or '').strip()
         new_password = request.form.get('new_password')
         confirm_password = request.form.get('confirm_password')
-        
-        # Get current user
+
         current_user = users_collection.find_one({'username': session['username']})
-        
-        # Verify current password
-        if current_user and current_user['password'] != current_password:
+        if not current_user:
+            return render_template('change_credentials.html', error='User not found')
+
+        # Verify current password against hash (support legacy plain password)
+        valid_current = False
+        if 'password_hash' in current_user:
+            valid_current = check_password_hash(current_user['password_hash'], current_password)
+        elif 'password' in current_user:
+            valid_current = (current_user['password'] == current_password)
+        if not valid_current:
             return render_template('change_credentials.html', error='Current password is incorrect')
-        
-        # Check if new password and confirmation match
+
         if new_password and new_password != confirm_password:
             return render_template('change_credentials.html', error='New passwords do not match')
-        
-        # Prepare update data
+
         update_data = {}
+        old_username = current_user['username']
         if new_username:
+            # Ensure target username not already taken
+            if users_collection.find_one({'username': new_username, '_id': {'$ne': current_user['_id']}}):
+                return render_template('change_credentials.html', error='Username already taken')
             update_data['username'] = new_username
         if new_password:
-            update_data['password'] = new_password
-        
-        # Update user credentials
+            update_data['password_hash'] = generate_password_hash(new_password)
+            # If legacy field exists, remove it
+            update = {'$set': update_data, '$unset': {'password': ''}}
+        else:
+            update = {'$set': update_data}
+
         if update_data:
-            # Update the user document
-            users_collection.update_one(
-                {'username': session['username']},
-                {'$set': update_data}
-            )
-            
-            # Update session username if changed
+            users_collection.update_one({'_id': current_user['_id']}, update)
+
+            # Optionally sync student name if it uniquely matches old username
+            if new_username:
+                matching = list(mongo.db.students.find({'name': old_username}))
+                if len(matching) == 1:
+                    mongo.db.students.update_one({'_id': matching[0]['_id']}, {'$set': {'name': new_username}})
+
             if new_username:
                 session['username'] = new_username
-            
+
             return render_template('change_credentials.html', success='Credentials updated successfully')
         else:
             return render_template('change_credentials.html', error='No changes provided')
-    
+
     return render_template('change_credentials.html')
 
 @app.route('/')
@@ -615,36 +569,7 @@ def index():
         response.headers['X-Frame-Options'] = 'DENY'
         return response
     
-    # If not logged in via session, check for remember me cookie
-    remember_token = request.cookies.get('remember_token')
-    if remember_token:
-        # Verify the token (in this case, it's just the username)
-        user = users_collection.find_one({'username': remember_token})
-        if user:
-            # Log the user in by setting session variables
-            session['logged_in'] = True
-            session['username'] = remember_token
-            session['current_group'] = session.get('current_group', None)
-            
-            group = session.get('current_group', None)
-            if group:
-                session['group'] = group
-            collection = get_collection(group)
-            students = list(collection.find())
-            for s in students:
-                zone, red, avg = categorize_student(s)
-                s['zone'] = zone
-                s['red_zone_fields'] = red
-                s['average_fields'] = avg
-            # Add cache control headers to prevent caching of protected pages
-            response = make_response(render_template('index.html', students=students, group=group))
-            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, private, max-age=0'
-            response.headers['Pragma'] = 'no-cache'
-            response.headers['Expires'] = '0'
-            response.headers['X-Frame-Options'] = 'DENY'
-            return response
-    
-    # If neither session nor cookie is valid, redirect to login
+    # Not logged in — redirect to login (no cookie auto-login)
     return redirect(url_for('login'))
 
 if __name__ == '__main__':

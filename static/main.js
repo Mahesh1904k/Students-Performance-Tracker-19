@@ -117,6 +117,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // (Removed) Show Categorization button handler
+
     document.getElementById('createGroupBtn').addEventListener('click', function(e) {
         e.preventDefault();
         const groupName = document.getElementById('newGroupName').value.trim();
@@ -434,17 +436,20 @@ function renderTable() {
     tbody.innerHTML = '';
     let filtered = getFilteredStudents();
     filtered.forEach(s => {
-        // Create red dot indicators for red zone fields
+        // Red, Average, and Good indicators
         const redFields = s.red_zone_fields || [];
-        const weekendExamHtml = redFields.includes('weekend_exam') ? `${s.weekend_exam}<span class="red-dot"></span>` : s.weekend_exam;
-        const midMarksHtml = redFields.includes('mid_marks') ? `${s.mid_marks}<span class="red-dot"></span>` : s.mid_marks;
-        const crtScoreHtml = redFields.includes('crt_score') ? `${s.crt_score}<span class="red-dot"></span>` : s.crt_score;
-        const attendanceHtml = redFields.includes('attendance_percent') ? `${s.attendance_percent}<span class="red-dot"></span>` : s.attendance_percent;
-        const gdAttendanceHtml = redFields.includes('gd_attendance') ? `${s.gd_attendance}<span class="red-dot"></span>` : s.gd_attendance;
-        const prevSemHtml = redFields.includes('previous_sem_percent') ? `${s.previous_sem_percent}<span class="red-dot"></span>` : s.previous_sem_percent;
-        const extraActivitiesHtml = redFields.includes('extra_activities_score') ? `${s.extra_activities_score}<span class="red-dot"></span>` : s.extra_activities_score;
-        const projectCountHtml = redFields.includes('project_count') ? `${s.project_count}<span class="red-dot"></span>` : s.project_count;
-        const backlogsHtml = redFields.includes('backlogs') ? `${s.backlogs}<span class="red-dot"></span>` : s.backlogs;
+        const avgFields = s.average_fields || [];
+        // Good fields = those not in red or average among the known metrics
+        function goodDotIf(field) { return (!redFields.includes(field) && !avgFields.includes(field)) ? '<span class="good-dot"></span>' : ''; }
+        const weekendExamHtml = `${s.weekend_exam}${redFields.includes('weekend_exam') ? '<span class="red-dot"></span>' : ''}${avgFields.includes('weekend_exam') ? '<span class="avg-dot"></span>' : ''}${goodDotIf('weekend_exam')}`;
+        const midMarksHtml = `${s.mid_marks}${redFields.includes('mid_marks') ? '<span class="red-dot"></span>' : ''}${avgFields.includes('mid_marks') ? '<span class="avg-dot"></span>' : ''}${goodDotIf('mid_marks')}`;
+        const crtScoreHtml = `${s.crt_score}${redFields.includes('crt_score') ? '<span class="red-dot"></span>' : ''}${avgFields.includes('crt_score') ? '<span class="avg-dot"></span>' : ''}${goodDotIf('crt_score')}`;
+        const attendanceHtml = `${s.attendance_percent}${redFields.includes('attendance_percent') ? '<span class="red-dot"></span>' : ''}${avgFields.includes('attendance_percent') ? '<span class="avg-dot"></span>' : ''}${goodDotIf('attendance_percent')}`;
+        const gdAttendanceHtml = `${s.gd_attendance}${redFields.includes('gd_attendance') ? '<span class="red-dot"></span>' : ''}${avgFields.includes('gd_attendance') ? '<span class="avg-dot"></span>' : ''}${goodDotIf('gd_attendance')}`;
+        const prevSemHtml = `${s.previous_sem_percent}${redFields.includes('previous_sem_percent') ? '<span class="red-dot"></span>' : ''}${avgFields.includes('previous_sem_percent') ? '<span class="avg-dot"></span>' : ''}${goodDotIf('previous_sem_percent')}`;
+        const extraActivitiesHtml = `${s.extra_activities_score}${redFields.includes('extra_activities_score') ? '<span class="red-dot"></span>' : ''}${avgFields.includes('extra_activities_score') ? '<span class="avg-dot"></span>' : ''}${goodDotIf('extra_activities_score')}`;
+        const projectCountHtml = `${s.project_count}${redFields.includes('project_count') ? '<span class="red-dot"></span>' : ''}${avgFields.includes('project_count') ? '<span class="avg-dot"></span>' : ''}${goodDotIf('project_count')}`;
+        const backlogsHtml = `${s.backlogs}${redFields.includes('backlogs') ? '<span class="red-dot"></span>' : ''}${avgFields.includes('backlogs') ? '<span class="avg-dot"></span>' : ''}${goodDotIf('backlogs')}`;
 
         let tr = document.createElement('tr');
         tr.innerHTML = `
@@ -498,6 +503,8 @@ function zoneColor(zone) {
     if (zone === 'Red Zone') return 'danger';
     return 'secondary';
 }
+
+// (Removed) renderCategorization()
 
 window.removeStudent = function(id) {
     if (!confirm('Are you sure you want to remove this student?')) return;
