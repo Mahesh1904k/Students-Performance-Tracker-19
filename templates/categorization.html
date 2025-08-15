@@ -16,57 +16,57 @@
             <tbody>
                 <tr>
                     <td><strong>Weekend Exam %</strong></td>
-                    <td class="text-success">≥ 80</td>
-                    <td class="text-warning">60 – 79</td>
-                    <td class="text-danger">< 60</td>
+                    <td class="text-success">≥ {{ criteria.weekend_exam.good }}</td>
+                    <td class="text-warning">{{ criteria.weekend_exam.avg }} – {{ (criteria.weekend_exam.good - 0.1) | round(1) }}</td>
+                    <td class="text-danger">< {{ criteria.weekend_exam.red }}</td>
                 </tr>
                 <tr>
                     <td><strong>Mid Marks %</strong></td>
-                    <td class="text-success">≥ 80</td>
-                    <td class="text-warning">60 – 79</td>
-                    <td class="text-danger">< 60</td>
+                    <td class="text-success">≥ {{ criteria.mid_marks.good }}</td>
+                    <td class="text-warning">{{ criteria.mid_marks.avg }} – {{ (criteria.mid_marks.good - 0.1) | round(1) }}</td>
+                    <td class="text-danger">< {{ criteria.mid_marks.red }}</td>
                 </tr>
                 <tr>
                     <td><strong>CRT %</strong></td>
-                    <td class="text-success">≥ 80</td>
-                    <td class="text-warning">60 – 79</td>
-                    <td class="text-danger">< 60</td>
+                    <td class="text-success">≥ {{ criteria.crt_score.good }}</td>
+                    <td class="text-warning">{{ criteria.crt_score.avg }} – {{ (criteria.crt_score.good - 0.1) | round(1) }}</td>
+                    <td class="text-danger">< {{ criteria.crt_score.red }}</td>
                 </tr>
                 <tr>
                     <td><strong>Attendance %</strong></td>
-                    <td class="text-success">≥ 80</td>
-                    <td class="text-warning">70 – 79</td>
-                    <td class="text-danger">< 70</td>
+                    <td class="text-success">≥ {{ criteria.attendance_percent.good }}</td>
+                    <td class="text-warning">{{ criteria.attendance_percent.avg }} – {{ (criteria.attendance_percent.good - 0.1) | round(1) }}</td>
+                    <td class="text-danger">< {{ criteria.attendance_percent.red }}</td>
                 </tr>
                 <tr>
                     <td><strong>GD Attendance %</strong></td>
-                    <td class="text-success">≥ 80</td>
-                    <td class="text-warning">70 – 79</td>
-                    <td class="text-danger">< 70</td>
+                    <td class="text-success">≥ {{ criteria.gd_attendance.good }}</td>
+                    <td class="text-warning">{{ criteria.gd_attendance.avg }} – {{ (criteria.gd_attendance.good - 0.1) | round(1) }}</td>
+                    <td class="text-danger">< {{ criteria.gd_attendance.red }}</td>
                 </tr>
                 <tr>
                     <td><strong>Previous Sem GPA</strong></td>
-                    <td class="text-success">≥ 8.0</td>
-                    <td class="text-warning">7.0 – 7.9</td>
-                    <td class="text-danger">< 7.0</td>
+                    <td class="text-success">≥ {{ criteria.previous_sem_percent.good }}</td>
+                    <td class="text-warning">{{ criteria.previous_sem_percent.avg }} – {{ (criteria.previous_sem_percent.good - 0.1) | round(1) }}</td>
+                    <td class="text-danger">< {{ criteria.previous_sem_percent.red }}</td>
                 </tr>
                 <tr>
                     <td><strong>Backlogs</strong></td>
-                    <td class="text-success">0</td>
-                    <td class="text-warning">0</td>
-                    <td class="text-danger">> 0 (any backlog = Red Zone)</td>
+                    <td class="text-success">{{ criteria.backlogs.good }}</td>
+                    <td class="text-warning">{{ criteria.backlogs.avg }}</td>
+                    <td class="text-danger">≥ {{ criteria.backlogs.red }} (any backlog = Red Zone)</td>
                 </tr>
                 <tr>
                     <td><strong>Extra Activities</strong></td>
-                    <td class="text-success">> 0</td>
-                    <td class="text-warning">0</td>
-                    <td>-</td>
+                    <td class="text-success">≥ {{ criteria.extra_activities_score.good }}</td>
+                    <td class="text-warning">{{ criteria.extra_activities_score.avg }}</td>
+                    <td class="text-danger">< {{ criteria.extra_activities_score.red }}</td>
                 </tr>
                 <tr>
                     <td><strong>Projects</strong></td>
-                    <td class="text-success">> 0</td>
-                    <td class="text-warning">0</td>
-                    <td>-</td>
+                    <td class="text-success">≥ {{ criteria.project_count.good }}</td>
+                    <td class="text-warning">{{ criteria.project_count.avg }}</td>
+                    <td class="text-danger">< {{ criteria.project_count.red }}</td>
                 </tr>
             </tbody>
         </table>
@@ -74,6 +74,7 @@
 
     <div class="text-center mt-4">
         <a href="{{ url_for('index') }}" class="btn btn-primary">Back to Home</a>
+        <a href="{{ url_for('edit_categorization') }}" class="btn btn-warning ms-2">Edit Criteria</a>
     </div>
 </div>
 {% endblock %}

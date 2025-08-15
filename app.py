@@ -242,7 +242,206 @@ def calculator():
 
 @app.route('/categorization')
 def categorization():
-    return render_template('categorization.html')
+    # Get current criteria from session or use defaults
+    criteria = session.get('categorization_criteria', {
+        'weekend_exam': {'good': 80, 'avg': 60, 'red': 60},
+        'mid_marks': {'good': 80, 'avg': 60, 'red': 60},
+        'crt_score': {'good': 80, 'avg': 60, 'red': 60},
+        'attendance_percent': {'good': 80, 'avg': 70, 'red': 70},
+        'gd_attendance': {'good': 80, 'avg': 70, 'red': 70},
+        'previous_sem_percent': {'good': 8.0, 'avg': 7.0, 'red': 7.0},
+        'backlogs': {'good': 0, 'avg': 0, 'red': 1},
+        'extra_activities_score': {'good': 1, 'avg': 0, 'red': 0},
+        'project_count': {'good': 1, 'avg': 0, 'red': 0}
+    })
+    return render_template('categorization.html', criteria=criteria)
+
+@app.route('/edit-categorization')
+@login_required
+def edit_categorization():
+    # Get current criteria from session or use defaults
+    criteria = session.get('categorization_criteria', {
+        'weekend_exam': {'good': 80, 'avg': 60, 'red': 60},
+        'mid_marks': {'good': 80, 'avg': 60, 'red': 60},
+        'crt_score': {'good': 80, 'avg': 60, 'red': 60},
+        'attendance_percent': {'good': 80, 'avg': 70, 'red': 70},
+        'gd_attendance': {'good': 80, 'avg': 70, 'red': 70},
+        'previous_sem_percent': {'good': 8.0, 'avg': 7.0, 'red': 7.0},
+        'backlogs': {'good': 0, 'avg': 0, 'red': 1},
+        'extra_activities_score': {'good': 1, 'avg': 0, 'red': 0},
+        'project_count': {'good': 1, 'avg': 0, 'red': 0}
+    })
+    return render_template('edit_categorization.html', criteria=criteria)
+
+@app.route('/update-categorization', methods=['POST'])
+@login_required
+def update_categorization():
+    try:
+        criteria = {
+            'weekend_exam': {
+                'good': float(request.form.get('weekend_exam_good', 80)),
+                'avg': float(request.form.get('weekend_exam_avg', 60)),
+                'red': float(request.form.get('weekend_exam_red', 60))
+            },
+            'mid_marks': {
+                'good': float(request.form.get('mid_marks_good', 80)),
+                'avg': float(request.form.get('mid_marks_avg', 60)),
+                'red': float(request.form.get('mid_marks_red', 60))
+            },
+            'crt_score': {
+                'good': float(request.form.get('crt_score_good', 80)),
+                'avg': float(request.form.get('crt_score_avg', 60)),
+                'red': float(request.form.get('crt_score_red', 60))
+            },
+            'attendance_percent': {
+                'good': float(request.form.get('attendance_percent_good', 80)),
+                'avg': float(request.form.get('attendance_percent_avg', 70)),
+                'red': float(request.form.get('attendance_percent_red', 70))
+            },
+            'gd_attendance': {
+                'good': float(request.form.get('gd_attendance_good', 80)),
+                'avg': float(request.form.get('gd_attendance_avg', 70)),
+                'red': float(request.form.get('gd_attendance_red', 70))
+            },
+            'previous_sem_percent': {
+                'good': float(request.form.get('previous_sem_percent_good', 8.0)),
+                'avg': float(request.form.get('previous_sem_percent_avg', 7.0)),
+                'red': float(request.form.get('previous_sem_percent_red', 7.0))
+            },
+            'backlogs': {
+                'good': float(request.form.get('backlogs_good', 0)),
+                'avg': float(request.form.get('backlogs_avg', 0)),
+                'red': float(request.form.get('backlogs_red', 1))
+            },
+            'extra_activities_score': {
+                'good': float(request.form.get('extra_activities_score_good', 1)),
+                'avg': float(request.form.get('extra_activities_score_avg', 0)),
+                'red': float(request.form.get('extra_activities_score_red', 0))
+            },
+            'project_count': {
+                'good': float(request.form.get('project_count_good', 1)),
+                'avg': float(request.form.get('project_count_avg', 0)),
+                'red': float(request.form.get('project_count_red', 0))
+            }
+        }
+        
+        # Store in session
+        session['categorization_criteria'] = criteria
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+def categorize_student(student):
+    # Get current criteria from session or use defaults
+    criteria = session.get('categorization_criteria', {
+        'weekend_exam': {'good': 80, 'avg': 60, 'red': 60},
+        'mid_marks': {'good': 80, 'avg': 60, 'red': 60},
+        'crt_score': {'good': 80, 'avg': 60, 'red': 60},
+        'attendance_percent': {'good': 80, 'avg': 70, 'red': 70},
+        'gd_attendance': {'good': 80, 'avg': 70, 'red': 70},
+        'previous_sem_percent': {'good': 8.0, 'avg': 7.0, 'red': 7.0},
+        'backlogs': {'good': 0, 'avg': 0, 'red': 1},
+        'extra_activities_score': {'good': 1, 'avg': 0, 'red': 0},
+        'project_count': {'good': 1, 'avg': 0, 'red': 0}
+    })
+    
+    red_zone_fields = []
+    average_fields = []
+    
+    # Weekend Exam
+    try:
+        val = float(student.get('weekend_exam', 0))
+    except:
+        val = 0
+    if val < criteria['weekend_exam']['red']:
+        red_zone_fields.append('weekend_exam')
+    elif val < criteria['weekend_exam']['good']:
+        average_fields.append('weekend_exam')
+    
+    # Mid Marks
+    try:
+        val = float(student.get('mid_marks', 0))
+    except:
+        val = 0
+    if val < criteria['mid_marks']['red']:
+        red_zone_fields.append('mid_marks')
+    elif val < criteria['mid_marks']['good']:
+        average_fields.append('mid_marks')
+    
+    # CRT Score
+    try:
+        val = float(student.get('crt_score', 0))
+    except:
+        val = 0
+    if val < criteria['crt_score']['red']:
+        red_zone_fields.append('crt_score')
+    elif val < criteria['crt_score']['good']:
+        average_fields.append('crt_score')
+    
+    # Attendance
+    try:
+        val = float(student.get('attendance_percent', 0))
+    except:
+        val = 0
+    if val < criteria['attendance_percent']['red']:
+        red_zone_fields.append('attendance_percent')
+    elif val < criteria['attendance_percent']['good']:
+        average_fields.append('attendance_percent')
+    
+    # GD Attendance
+    try:
+        val = float(student.get('gd_attendance', 0))
+    except:
+        val = 0
+    if val < criteria['gd_attendance']['red']:
+        red_zone_fields.append('gd_attendance')
+    elif val < criteria['gd_attendance']['good']:
+        average_fields.append('gd_attendance')
+    
+    # Previous Sem GPA
+    try:
+        val = float(student.get('previous_sem_percent', 0))
+    except:
+        val = 0
+    if val < criteria['previous_sem_percent']['red']:
+        red_zone_fields.append('previous_sem_percent')
+    elif val < criteria['previous_sem_percent']['good']:
+        average_fields.append('previous_sem_percent')
+    
+    # Backlogs
+    try:
+        val = float(student.get('backlogs', 0))
+    except:
+        val = 0
+    if val >= criteria['backlogs']['red']:
+        red_zone_fields.append('backlogs')
+    elif val > criteria['backlogs']['good']:
+        average_fields.append('backlogs')
+    
+    # Extra Activities
+    try:
+        val = float(student.get('extra_activities_score', 0))
+    except:
+        val = 0
+    if val <= criteria['extra_activities_score']['avg']:
+        average_fields.append('extra_activities_score')
+    
+    # Projects
+    try:
+        val = float(student.get('project_count', 0))
+    except:
+        val = 0
+    if val <= criteria['project_count']['avg']:
+        average_fields.append('project_count')
+    
+    # Final Zone
+    if red_zone_fields:
+        return 'Red Zone', red_zone_fields, average_fields
+    elif average_fields:
+        return 'Average', [], average_fields
+    else:
+        return 'Good', [], []
 
 @app.route('/api/students', methods=['GET'])
 def api_get_students():

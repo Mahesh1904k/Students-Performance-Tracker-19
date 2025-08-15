@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-4">
+    <h2 class="mb-4 text-center">Edit Categorization Criteria</h2>
+    
+    <form id="categorizationForm" method="POST" action="{{ url_for('update_categorization') }}">
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th class="bg-success text-white">Good (≥)</th>
+                        <th class="bg-warning text-dark">Average (≥)</th>
+                        <th class="bg-danger text-white">Red Zone (<)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Weekend Exam %</strong></td>
+                        <td><input type="number" name="weekend_exam_good" class="form-control" value="{{ criteria.weekend_exam.good }}" min="0" max="100" required></td>
+                        <td><input type="number" name="weekend_exam_avg" class="form-control" value="{{ criteria.weekend_exam.avg }}" min="0" max="100" required></td>
+                        <td><input type="number" name="weekend_exam_red" class="form-control" value="{{ criteria.weekend_exam.red }}" min="0" max="100" required></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mid Marks %</strong></td>
+                        <td><input type="number" name="mid_marks_good" class="form-control" value="{{ criteria.mid_marks.good }}" min="0" max="100" required></td>
+                        <td><input type="number" name="mid_marks_avg" class="form-control" value="{{ criteria.mid_marks.avg }}" min="0" max="100" required></td>
+                        <td><input type="number" name="mid_marks_red" class="form-control" value="{{ criteria.mid_marks.red }}" min="0" max="100" required></td>
+                    </tr>
+                    <tr>
+                        <td><strong>CRT %</strong></td>
+                        <td><input type="number" name="crt_score_good" class="form-control" value="{{ criteria.crt_score.good }}" min="0" max="100" required></td>
+                        <td><input type="number" name="crt_score_avg" class="form-control" value="{{ criteria.crt_score.avg }}" min="0" max="100" required></td>
+                        <td><input type="number" name="crt_score_red" class="form-control" value="{{ criteria.crt_score.red }}" min="0" max="100" required></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Attendance %</strong></td>
+                        <td><input type="number" name="attendance_percent_good" class="form-control" value="{{ criteria.attendance_percent.good }}" min="0" max="100" required></td>
+                        <td><input type="number" name="attendance_percent_avg" class="form-control" value="{{ criteria.attendance_percent.avg }}" min="0" max="100" required></td>
+                        <td><input type="number" name="attendance_percent_red" class="form-control" value="{{ criteria.attendance_percent.red }}" min="0" max="100" required></td>
+                    </tr>
+                    <tr>
+                        <td><strong>GD Attendance %</strong></td>
+                        <td><input type="number" name="gd_attendance_good" class="form-control" value="{{ criteria.gd_attendance.good }}" min="0" max="100" required></td>
+                        <td><input type="number" name="gd_attendance_avg" class="form-control" value="{{ criteria.gd_attendance.avg }}" min="0" max="100" required></td>
+                        <td><input type="number" name="gd_attendance_red" class="form-control" value="{{ criteria.gd_attendance.red }}" min="0" max="100" required></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Previous Sem GPA</strong></td>
+                        <td><input type="number" name="previous_sem_percent_good" class="form-control" value="{{ criteria.previous_sem_percent.good }}" min="0" max="10" step="0.1" required></td>
+                        <td><input type="number" name="previous_sem_percent_avg" class="form-control" value="{{ criteria.previous_sem_percent.avg }}" min="0" max="10" step="0.1" required></td>
+                        <td><input type="number" name="previous_sem_percent_red" class="form-control" value="{{ criteria.previous_sem_percent.red }}" min="0" max="10" step="0.1" required></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Backlogs</strong></td>
+                        <td><input type="number" name="backlogs_good" class="form-control" value="{{ criteria.backlogs.good }}" min="0" max="15" required></td>
+                        <td><input type="number" name="backlogs_avg" class="form-control" value="{{ criteria.backlogs.avg }}" min="0" max="15" required></td>
+                        <td><input type="number" name="backlogs_red" class="form-control" value="{{ criteria.backlogs.red }}" min="0" max="15" required></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Extra Activities</strong></td>
+                        <td><input type="number" name="extra_activities_score_good" class="form-control" value="{{ criteria.extra_activities_score.good }}" min="0" max="10" required></td>
+                        <td><input type="number" name="extra_activities_score_avg" class="form-control" value="{{ criteria.extra_activities_score.avg }}" min="0" max="10" required></td>
+                        <td><input type="number" name="extra_activities_score_red" class="form-control" value="{{ criteria.extra_activities_score.red }}" min="0" max="10" required></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Projects</strong></td>
+                        <td><input type="number" name="project_count_good" class="form-control" value="{{ criteria.project_count.good }}" min="0" max="10" required></td>
+                        <td><input type="number" name="project_count_avg" class="form-control" value="{{ criteria.project_count.avg }}" min="0" max="10" required></td>
+                        <td><input type="number" name="project_count_red" class="form-control" value="{{ criteria.project_count.red }}" min="0" max="10" required></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-success">Save Changes</button>
+            <a href="{{ url_for('categorization') }}" class="btn btn-secondary ms-2">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+document.getElementById('categorizationForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    fetch('{{ url_for("update_categorization") }}', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Categorization criteria updated successfully!');
+            window.location.href = '{{ url_for("categorization") }}';
+        } else {
+            alert('Error updating criteria: ' + data.error);
+        }
+    })
+    .catch(error => {
+        alert('Error: ' + error);
+    });
+});
+</script>
+{% endblock %}
