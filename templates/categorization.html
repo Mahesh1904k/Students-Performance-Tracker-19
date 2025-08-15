@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-4">
+    <h2 class="mb-4 text-center">Student Performance Categorization</h2>
+    
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Field</th>
+                    <th class="bg-success text-white">Good</th>
+                    <th class="bg-warning text-dark">Average</th>
+                    <th class="bg-danger text-white">Red Zone</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Weekend Exam %</strong></td>
+                    <td class="text-success">≥ 80</td>
+                    <td class="text-warning">60 – 79</td>
+                    <td class="text-danger">< 60</td>
+                </tr>
+                <tr>
+                    <td><strong>Mid Marks %</strong></td>
+                    <td class="text-success">≥ 80</td>
+                    <td class="text-warning">60 – 79</td>
+                    <td class="text-danger">< 60</td>
+                </tr>
+                <tr>
+                    <td><strong>CRT %</strong></td>
+                    <td class="text-success">≥ 80</td>
+                    <td class="text-warning">60 – 79</td>
+                    <td class="text-danger">< 60</td>
+                </tr>
+                <tr>
+                    <td><strong>Attendance %</strong></td>
+                    <td class="text-success">≥ 80</td>
+                    <td class="text-warning">70 – 79</td>
+                    <td class="text-danger">< 70</td>
+                </tr>
+                <tr>
+                    <td><strong>GD Attendance %</strong></td>
+                    <td class="text-success">≥ 80</td>
+                    <td class="text-warning">70 – 79</td>
+                    <td class="text-danger">< 70</td>
+                </tr>
+                <tr>
+                    <td><strong>Previous Sem GPA</strong></td>
+                    <td class="text-success">≥ 8.0</td>
+                    <td class="text-warning">7.0 – 7.9</td>
+                    <td class="text-danger">< 7.0</td>
+                </tr>
+                <tr>
+                    <td><strong>Backlogs</strong></td>
+                    <td class="text-success">0</td>
+                    <td class="text-warning">0</td>
+                    <td class="text-danger">> 0 (any backlog = Red Zone)</td>
+                </tr>
+                <tr>
+                    <td><strong>Extra Activities</strong></td>
+                    <td class="text-success">> 0</td>
+                    <td class="text-warning">0</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td><strong>Projects</strong></td>
+                    <td class="text-success">> 0</td>
+                    <td class="text-warning">0</td>
+                    <td>-</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="{{ url_for('index') }}" class="btn btn-primary">Back to Home</a>
+    </div>
+</div>
+{% endblock %}

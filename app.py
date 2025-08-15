@@ -240,6 +240,10 @@ def calculator():
         # Do not show any message about creating students here
         return render_template('calculator.html', percentage=None)
 
+@app.route('/categorization')
+def categorization():
+    return render_template('categorization.html')
+
 @app.route('/api/students', methods=['GET'])
 def api_get_students():
     group = request.args.get('group')
